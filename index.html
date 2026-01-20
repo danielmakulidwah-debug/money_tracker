@@ -1,189 +1,225 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Budget Master</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Tailwind CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- React -->
-  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-
-  <!-- Babel -->
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-</head>
-<body class="bg-slate-900 text-white">
-
-  <div id="root"></div>
-
-  <script type="text/babel">
-
-    const { useState } = React;
-
-    function BudgetMaster() {
-      const [view, setView] = useState("overview");
-
-      const [income, setIncome] = useState([
-        { id: 1, amount: 150000, source: "Salary", date: "2026-01-15", category: "Income" }
-      ]);
-
-      const [expenses, setExpenses] = useState([
-        { id: 1, amount: 50000, description: "Rent", date: "2026-01-01", category: "Housing" },
-        { id: 2, amount: 15000, description: "Groceries", date: "2026-01-05", category: "Food" },
-        { id: 3, amount: 5000, description: "Taxi", date: "2026-01-06", category: "Transport" }
-      ]);
-
-      const categories = ["Food","Transport","Housing","Utilities","Shopping","Entertainment","Healthcare","Other"];
-
-      const [budgets, setBudgets] = useState({
-        Food: 30000,
-        Transport: 20000,
-        Housing: 50000,
-        Utilities: 15000,
-        Shopping: 25000,
-        Entertainment: 10000,
-        Healthcare: 15000,
-        Other: 10000
-      });
-
-      const [newTx, setNewTx] = useState({
-        type: "expense",
-        amount: "",
-        description: "",
-        category: "Food",
-        date: new Date().toISOString().slice(0,10)
-      });
-
-      const formatMoney = (n) =>
-        new Intl.NumberFormat("en-MW", {
-          style: "currency",
-          currency: "MWK",
-          minimumFractionDigits: 0
-        }).format(n);
-
-      const totalIncome = income.reduce((s,i)=>s+i.amount,0);
-      const totalExpenses = expenses.reduce((s,e)=>s+e.amount,0);
-      const balance = totalIncome - totalExpenses;
-
-      const addTransaction = () => {
-        if (!newTx.amount || !newTx.description) {
-          alert("Fill all fields");
-          return;
-        }
-
-        const tx = {
-          id: Date.now(),
-          amount: Number(newTx.amount),
-          date: newTx.date,
-          category: newTx.type === "income" ? "Income" : newTx.category,
-          description: newTx.description,
-          source: newTx.description
-        };
-
-        newTx.type === "income"
-          ? setIncome([...income, tx])
-          : setExpenses([...expenses, tx]);
-
-        setView("overview");
-        setNewTx({ ...newTx, amount:"", description:"" });
-      };
-
-      return (
-        <div className="min-h-screen p-6 max-w-6xl mx-auto">
-
-          <h1 className="text-4xl font-bold text-green-400 mb-2">Budget Master</h1>
-          <p className="text-slate-400 mb-6">Track your money, control your spending</p>
-
-          <div className="flex gap-3 mb-6">
-            <button onClick={()=>setView("overview")} className="btn">Overview</button>
-            <button onClick={()=>setView("add")} className="btn">Add Transaction</button>
-            <button onClick={()=>setView("budgets")} className="btn">Budgets</button>
-          </div>
-
-          {view === "overview" && (
-            <>
-              <div className="grid md:grid-cols-3 gap-4 mb-6">
-                <Card title="Income" value={formatMoney(totalIncome)} />
-                <Card title="Expenses" value={formatMoney(totalExpenses)} />
-                <Card title="Balance" value={formatMoney(balance)} />
-              </div>
-
-              <div className="bg-slate-800 p-5 rounded-xl">
-                <h2 className="text-xl font-bold mb-4">Recent Expenses</h2>
-                {expenses.map(e=>(
-                  <div key={e.id} className="flex justify-between py-2 border-b border-slate-700">
-                    <span>{e.description}</span>
-                    <span className="text-red-400">{formatMoney(e.amount)}</span>
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
-
-          {view === "add" && (
-            <div className="bg-slate-800 p-6 rounded-xl max-w-xl">
-              <h2 className="text-xl font-bold mb-4">Add Transaction</h2>
-
-              <select className="input" onChange={e=>setNewTx({...newTx,type:e.target.value})}>
-                <option value="expense">Expense</option>
-                <option value="income">Income</option>
-              </select>
-
-              <input className="input" type="number" placeholder="Amount"
-                value={newTx.amount}
-                onChange={e=>setNewTx({...newTx,amount:e.target.value})} />
-
-              <input className="input" type="text" placeholder="Description"
-                value={newTx.description}
-                onChange={e=>setNewTx({...newTx,description:e.target.value})} />
-
-              {newTx.type==="expense" && (
-                <select className="input"
-                  onChange={e=>setNewTx({...newTx,category:e.target.value})}>
-                  {categories.map(c=><option key={c}>{c}</option>)}
-                </select>
-              )}
-
-              <button onClick={addTransaction} className="btn w-full mt-4">Save</button>
-            </div>
-          )}
-
-        </div>
-      );
-    }
-
-    function Card({title,value}) {
-      return (
-        <div className="bg-slate-800 p-5 rounded-xl">
-          <p className="text-slate-400">{title}</p>
-          <p className="text-2xl font-bold">{value}</p>
-        </div>
-      );
-    }
-
-    ReactDOM.createRoot(document.getElementById("root")).render(<BudgetMaster />);
-
-  </script>
+  <!-- Font Awesome Icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
 
   <style>
-    .btn {
-      background: linear-gradient(to right,#22c55e,#3b82f6);
-      padding: 0.75rem 1.25rem;
-      border-radius: 0.75rem;
-      font-weight: 600;
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: #fff;
     }
-    .input {
-      width: 100%;
-      margin-bottom: 0.75rem;
-      padding: 0.75rem;
-      border-radius: 0.5rem;
+
+    .app {
+      max-width: 420px;
+      margin: auto;
+      padding: 16px;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header h1 {
+      font-size: 22px;
+      margin: 0;
+    }
+
+    .subtitle {
+      color: #94a3b8;
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+
+    .menu-btn {
+      font-size: 22px;
+      cursor: pointer;
+    }
+
+    /* Balance */
+    .balance {
       background: #1e293b;
-      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 10px;
+      border-radius: 10px;
+      background: #1e293b;
+      text-align: center;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .tab.active {
+      background: linear-gradient(90deg,#22c55e,#3b82f6);
+      font-weight: bold;
+    }
+
+    /* Cards */
+    .card {
+      background: #1e293b;
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 16px;
+    }
+
+    .card h2 {
+      font-size: 16px;
+      margin-bottom: 10px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    .date {
+      color: #94a3b8;
+      font-size: 12px;
+    }
+
+    .btn {
+      margin-top: 10px;
+      padding: 10px;
+      background: #334155;
+      border-radius: 10px;
+      text-align: center;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    /* Side Menu */
+    .menu {
+      position: fixed;
+      top: 0;
+      right: -240px;
+      width: 220px;
+      height: 100%;
+      background: #020617;
+      padding: 20px;
+      transition: 0.3s;
+    }
+
+    .menu.open {
+      right: 0;
+    }
+
+    .menu h3 {
+      margin-bottom: 16px;
+    }
+
+    .menu-item {
+      padding: 10px 0;
+      border-bottom: 1px solid #1e293b;
+      cursor: pointer;
     }
   </style>
+</head>
+
+<body>
+
+<div class="app">
+  <!-- Header -->
+  <div class="header">
+    <h1>Budget Master</h1>
+    <i class="fas fa-bars menu-btn" onclick="toggleMenu()"></i>
+  </div>
+  <div class="subtitle">Track your money, control it</div>
+
+  <!-- Balance -->
+  <div class="balance">
+    <strong>MWK 850,000</strong>
+    <span>Manual ▼</span>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <div class="tab active">Overview</div>
+    <div class="tab">Add Transaction</div>
+    <div class="tab">Budgets</div>
+  </div>
+
+  <!-- Income -->
+  <div class="card">
+    <h2><i class="fas fa-arrow-down text-green"></i> Income</h2>
+
+    <div class="row">
+      <span>Pay</span>
+      <strong>MWK 350,000</strong>
+    </div>
+    <div class="date">25th January 2026</div>
+
+    <div class="row">
+      <span>Fee</span>
+      <strong>MWK 100,000</strong>
+    </div>
+    <div class="date">6th February 2026</div>
+
+    <div class="btn">View all income history</div>
+  </div>
+
+  <!-- Expenses -->
+  <div class="card">
+    <h2><i class="fas fa-arrow-up"></i> Expenses</h2>
+
+    <div class="row">
+      <span>School Fees</span>
+      <strong>MWK 50,000</strong>
+    </div>
+    <div class="date">14th December 2025</div>
+
+    <div class="row">
+      <span>Food</span>
+      <strong>MWK 80,000</strong>
+    </div>
+    <div class="date">30th December 2025</div>
+
+    <div class="btn">View all expenses</div>
+  </div>
+</div>
+
+<!-- Side Menu -->
+<div class="menu" id="menu">
+  <h3>Menu</h3>
+  <div class="menu-item"><i class="fas fa-home"></i> Dashboard</div>
+  <div class="menu-item"><i class="fas fa-plus"></i> Add Transaction</div>
+  <div class="menu-item"><i class="fas fa-chart-pie"></i> Budgets</div>
+  <div class="menu-item"><i class="fas fa-gear"></i> Settings</div>
+</div>
+
+<script>
+  function toggleMenu() {
+    document.getElementById("menu").classList.toggle("open");
+  }
+</script>
 
 </body>
 </html>
